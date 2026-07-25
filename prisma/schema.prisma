@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String    @unique
+  passwordHash      String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  resetToken        String?
+  resetTokenExpires DateTime?
+
+  socialPosts       SocialPost[]
+  seoContent        SeoContent[]
+  keywords          Keyword[]
+  integrations      Integration[]
+}
+
+model SocialPost {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform    String    // e.g. "linkedin", "x", "instagram"
+  content     String
+  status      String    @default("draft") // draft | scheduled | published | failed
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, status])
+}
+
+model SeoContent {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  targetKeyword String?
+  body         String
+  seoScore     Int?     // 0-100, computed on generation/edit
+  status       String   @default("draft") // draft | published
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, status])
+}
+
+model Keyword {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  term          String
+  targetUrl     String?
+  currentRank   Int?
+  searchVolume  Int?
+  difficulty    Int?
+  history       KeywordRank[]
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
+
+model KeywordRank {
+  id         String   @id @default(cuid())
+  keywordId  String
+  keyword    Keyword  @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  rank       Int
+  checkedAt  DateTime @default(now())
+
+  @@index([keywordId, checkedAt])
+}
+
+// Stores connection status/tokens for GA4, Search Console, Ahrefs, Screaming Frog
+model Integration {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider      String    // "ga4" | "search_console" | "ahrefs" | "screaming_frog"
+  accessToken   String?
+  refreshToken  String?
+  apiKey        String?
+  propertyId    String?   // GA4 property / GSC site url / etc
+  connected     Boolean   @default(false)
+  lastSyncedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, provider])
+}
