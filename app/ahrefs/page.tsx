@@ -1,8 +1,12 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import AppShell from "@/components/AppShell";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  redirect(session ? "/dashboard" : "/login");
+export default function Page() {
+  return (
+    <AppShell title="Ahrefs">
+      <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center">
+        <p className="text-slate-300">Connect Ahrefs for backlink and rank tracking data.</p>
+        <p className="mt-2 text-sm text-slate-500">Coming in Phase 4 of the rebuild.</p>
+      </div>
+    </AppShell>
+  );
 }
