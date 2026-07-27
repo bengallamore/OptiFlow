@@ -83,7 +83,7 @@ export default function SocialPostsPage() {
         onSubmit={handleCreate}
         className="mb-8 rounded-xl border border-slate-800 bg-slate-900 p-5"
       >
-        <div className="mb-4 flex gap-3">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row">
           <select
             value={platform}
             onChange={(e) => setPlatform(e.target.value)}
