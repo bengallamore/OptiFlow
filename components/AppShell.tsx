@@ -10,7 +10,7 @@ export default function AppShell({
   title: string;
   children: React.ReactNode;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(true);
 
   return (
     <div className="flex min-h-screen flex-col sm:flex-row">
